@@ -1,0 +1,12 @@
+This is a python API for Caixa Geral de Depósitos - Caixa Directa Online.
+
+Since CGD does not offer a REST API or webservice over its service,
+I decided to build it myself. This is done by parsing their website -
+an ugly and error-prone method, but the best that can be done as of now.
+
+At the moment, only the most basic functions are implemented.
+"test.py" exemplifies some functions.
+
+Don't hesitate to contact me with questions, suggestions or contributions
+
+goncalopp@gmail.com
