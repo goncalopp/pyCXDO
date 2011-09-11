@@ -13,6 +13,8 @@ class RedirectedException( Exception ):
     pass
 class AuthenticationException( Exception):
     pass
+class UnauthenticatedException( Exception ):
+    pass
 
 def get_cxdo_version(html):
     B1= "<!-- CXDO: "
@@ -27,15 +29,13 @@ def get_cxdo_version(html):
 
 class CXDO(object):
     def __init__(self, user, password, cookie_file=None):
-        if cookie_file:
-            self.cookie_file= cookie_file
+        self.cookie_file= cookie_file
+        try:
             self.load_session()
-            if not self.is_authenticated():
-                logging.info("saved cookie session has expired")
-                self.authenticate(user, password)
-        else:
-            self.new_session()
+        except:
+            #file doesn't exist or cookie has expired, etc
             self.authenticate(user, password)
+
         
     def get_page(self, url, parameters={}, allow_redirects=False):
         d= urllib.urlencode(parameters)
@@ -53,10 +53,11 @@ class CXDO(object):
         self.opener= urllib2.build_opener( urllib2.HTTPCookieProcessor(self.cookiejar) )
 
     def load_session(self):
-        logging.debug("loading cookie from file")
-        self.cookiejar= cookielib.LWPCookieJar( )
+        self.new_session()
         self.cookiejar.load( filename= self.cookie_file, ignore_discard=True)
-        self.opener= urllib2.build_opener( urllib2.HTTPCookieProcessor(self.cookiejar) )
+        logging.debug("cookie loaded from file")
+        if not self.is_authenticated():
+            raise UnauthenticatedException("saved cookie session has expired")
         
 
     def save_session(self):
@@ -87,3 +88,5 @@ class CXDO(object):
         l2_html= self.get_page( LOGINPAGE, auth_data, allow_redirects=True)
         if not self.is_authenticated():
             raise AuthenticationException("Could not authenticate with given data")
+        if not self.cookie_file is None:
+            self.save_session()
