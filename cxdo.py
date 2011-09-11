@@ -75,8 +75,7 @@ class CXDO(object):
     def authenticate(self, user, password):
         logging.debug("authenticating...")
         try:
-            assert type(user)==type(password)==int
-            user, password= str(user), str(password)
+            assert type(user)==type(password)==str
             assert len(user)==7
             assert len(password)==6
         except:

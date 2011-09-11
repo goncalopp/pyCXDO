@@ -2,8 +2,8 @@ import logging
 from cxdo import CXDO
 
 COOKIE_FILE= "cookie.txt"
-CONTRACT= 1234567
-PASSWORD= 123456
+CONTRACT= "1234567"
+PASSWORD= "123456"
 
 logging.basicConfig(level=logging.DEBUG)
 session = CXDO(CONTRACT, PASSWORD, COOKIE_FILE)
