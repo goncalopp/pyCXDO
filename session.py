@@ -1,5 +1,4 @@
 ﻿import urllib, urllib2
-from BeautifulSoup import BeautifulSoup
 import cxdo_auth, parsing, urls
 import cookielib
 import logging
@@ -16,7 +15,7 @@ class SiteVersionMismatch( Exception ):
     pass
 
 
-class CXDOSession(object):
+class Session(object):
     ENFORCE_VERSION= True  #enforce site version
     def __init__(self, user, password, cookie_file=None):
         self.cookie_file= cookie_file
