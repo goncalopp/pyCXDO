@@ -25,3 +25,6 @@ def get_accounts( html):
     values=     [ option['value'] for option in options ]
     labels=     [ option.string for option in options ]
     return labels
+
+def session_expired( html ):
+    return "mainArea_center_unAuth" in html
