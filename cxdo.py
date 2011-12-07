@@ -4,7 +4,7 @@ import cxdo_auth
 import cookielib
 import logging
 
-CXDO_VERSION= "v54_20_0_WS_v5_122_2_8"
+CXDO_VERSION= "v57_2_0_WS_v5_123_1"
 LOGINSTARTPAGE= "https://caixadirecta.cgd.pt/CaixaDirecta/loginStart.do"
 LOGINPAGE= "https://caixadirecta.cgd.pt/CaixaDirecta/login.do"
 MAINPAGE= "https://caixadirecta.cgd.pt/CaixaDirecta/profile.do"
@@ -43,7 +43,7 @@ class CXDO(object):
         if not allow_redirects and f.geturl()!=url:
             raise RedirectedException("got "+f.geturl()+" instead of "+url)
         html= f.read()
-        if not get_cxdo_version(html)=="v54_20_0_WS_v5_122_2_8":
+        if not get_cxdo_version(html)==CXDO_VERSION:
             logging.warn("CXDO site version differs from expected. got'"+get_cxdo_version(html)+"', expected '"+CXDO_VERSION+"'")
         return html
         
