@@ -1,3 +1,5 @@
+from BeautifulSoup import BeautifulSoup
+
 class ParsingError( Exception ):
     pass
 
@@ -12,3 +14,14 @@ def get_cxdo_version(html):
     except:
         raise ParsingError("Could not detect CXDO site version")
 
+def get_accounts( html):
+    '''given the html from ORDEM_STATEMENT or PRAZO_STATEMENT urls, gets the accounts labels'''
+    soup= BeautifulSoup(html)
+    fieldset=   soup.find('fieldset')
+    if not fieldset:
+        import pdb;pdb.set_trace()
+        raise ParsingError()
+    options=    fieldset.div.select.findAll("option")
+    values=     [ option['value'] for option in options ]
+    labels=     [ option.string for option in options ]
+    return labels

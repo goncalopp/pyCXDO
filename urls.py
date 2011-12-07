@@ -1,6 +1,6 @@
-LOGINSTART=     "https://caixadirecta.cgd.pt/CaixaDirecta/loginStart.do"
-LOGIN=          "https://caixadirecta.cgd.pt/CaixaDirecta/login.do"
-MAIN=           "https://caixadirecta.cgd.pt/CaixaDirecta/profile.do"
+LOGINSTART=         "https://caixadirecta.cgd.pt/CaixaDirecta/loginStart.do"
+LOGIN=              "https://caixadirecta.cgd.pt/CaixaDirecta/login.do"
+MAIN=               "https://caixadirecta.cgd.pt/CaixaDirecta/profile.do"
 ORDEM_STATEMENT=    "https://caixadirecta.cgd.pt/CaixaDirecta/globalStatement.do"
 PRAZO_STATEMENT=    "https://caixadirecta.cgd.pt/CaixaDirecta/savingsBalance.do"
 
@@ -21,3 +21,9 @@ def login( login_start_page_html, username, password):
 
 def main():
     return MAIN,
+
+def ordem_statement():
+    return ORDEM_STATEMENT,
+
+def prazo_statement():
+    return PRAZO_STATEMENT,
