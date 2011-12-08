@@ -48,7 +48,7 @@ class Session(object):
         try:
             html= self.get_page( *urls.ordem_statement() )
             return True
-        except UnauthenticatedException:
+        except (UnauthenticatedException, RedirectedException):
             return False
 
     def _authenticate(self, user, password):
