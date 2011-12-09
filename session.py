@@ -60,7 +60,7 @@ class Session(object):
         except AssertionError:
             raise Exception("Wrong user/password parameters")
         l1_html= self.get_page( *urls.login_start(user), check_authentication=False ) #needed to set cookies?
-        l2_html= self.get_page( *urls.login(l1_html, user,password))
+        l2_html= self.get_page( *urls.login(l1_html, user,password), check_authentication=False)
         if not self._check_is_authenticated():
             raise AuthenticationException("Could not authenticate with given data")
         if not self.cookie_file is None:
