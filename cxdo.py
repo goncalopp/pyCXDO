@@ -47,7 +47,8 @@ class CXDO( object ):
         '''lists accounts by name'''
         if not hasattr(self, "accounts"):
             c=self.connection
-            self.accounts= \
+            accounts= \
                 [ Account(name, index, Account.ORDEM) for name,index in c.get_ordem_accounts().items() ] + \
-                [ Account(name, index, Account.ORDEM) for name,index in c.get_prazo_accounts().items()]
-        return map(Account.getName, self.accounts)
+                [ Account(name, index, Account.PRAZO) for name,index in c.get_prazo_accounts().items()]
+            self.accounts= dict( [(a.getName(), a) for a in accounts])
+        return self.accounts.keys()
