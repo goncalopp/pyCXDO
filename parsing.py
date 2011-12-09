@@ -3,6 +3,9 @@ from BeautifulSoup import BeautifulSoup
 class ParsingError( Exception ):
     pass
 
+class CXDOTemporaryError( Exception ):
+    pass
+
 def get_cxdo_version(html):
     '''Get the cxdo site version on all pages'''
     B1= "<!-- CXDO: "
@@ -16,6 +19,8 @@ def get_cxdo_version(html):
 
 def get_accounts( html):
     '''gets a dict with accounts indexes, labels on ORDEM_STATEMENT, PRAZO_STATEMENT'''
+    if "Por favor, tente mais tarde" in html:
+        raise CXDOTemporaryError("page returned 'Por favor, tente mais tarde'")
     soup= BeautifulSoup(html)
     fieldset=   soup.find('fieldset')
     if not fieldset:
