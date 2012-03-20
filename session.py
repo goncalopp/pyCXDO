@@ -16,6 +16,7 @@ class SiteVersionMismatch( Exception ):
 
 
 class Session(object):
+    '''transparently performs authentication when necessary, keeps cookie file'''
     ENFORCE_VERSION= True  #enforce site version
     def __init__(self, user, password, cookie_file=None):
         self.cookie_file= cookie_file
