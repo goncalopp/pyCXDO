@@ -46,7 +46,7 @@ class Session(object):
 
     def _check_is_authenticated(self):
         try:
-            html= self.get_page( *urls.ordem_statement() )
+            html= self.get_page( *urls.account_statement() )
             return True
         except (UnauthenticatedException, RedirectedException):
             return False
@@ -81,7 +81,7 @@ class Session(object):
             site_version= parsing.get_cxdo_version(html)
             if site_version!=CXDO_VERSION:
                 tmp= "CXDO site version differs from expected. got '{0}', expected '{1}'".format(site_version, CXDO_VERSION)
-                if CXDOSession.ENFORCE_VERSION:
+                if Session.ENFORCE_VERSION:
                     raise SiteVersionMismatch( tmp )
                 else:
                     logging.warn( tmp )

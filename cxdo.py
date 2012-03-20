@@ -43,15 +43,16 @@ class Account( CXDOConnectedObject ):
 class CXDOConnection( session.Session ):
     '''this class contains high level methods to fetch information from the site'''
     def get_ordem_accounts(self):
-        html= self.get_page( *urls.ordem_statement() )
+        html= self.get_page( *urls.account_statement( ordem= True) )
         return parsing.get_accounts(html)
 
     def get_prazo_accounts(self):
-        html= self.get_page( *urls.prazo_statement() )
+        html= self.get_page( *urls.account_statement( ordem=False) )
         return parsing.get_accounts(html)
     
     def get_movements_file(self, account_index, start_date, end_date, ordem=True, format='tsv'):
-        html= self.get_page( *urls.get_movements_file( account_index, start_date, end_date, ordem, format), detect_version=False)
+        self.get_page( *urls.account_statement( account_index=account_index, ordem=ordem, start_date=start_date, end_date=end_date))
+        html= self.get_page( *urls.get_movements_file( ordem=ordem, start_date=start_date, end_date=end_date, format=format), detect_version=False)
         return html
 
 class CXDO( CXDOConnectedObject ):
