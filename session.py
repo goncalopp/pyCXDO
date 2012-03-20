@@ -3,7 +3,7 @@ import cxdo_auth, parsing, urls
 import cookielib
 import logging
 
-CXDO_VERSION= "v57_2_0_WS_v5_123_1"
+CXDO_VERSION= "v61_1_0_WS_v5_124_1"
 
 class RedirectedException( Exception ):
     pass
