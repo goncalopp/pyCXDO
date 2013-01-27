@@ -1,11 +1,13 @@
-LOGINSTART=         "https://caixadirecta.cgd.pt/CaixaDirecta/loginStart.do"
-LOGIN=              "https://caixadirecta.cgd.pt/CaixaDirecta/login.do"
-MAIN=               "https://caixadirecta.cgd.pt/CaixaDirecta/profile.do"
-ORDEM_STATEMENT=    "https://caixadirecta.cgd.pt/CaixaDirecta/globalStatement.do"
-PRAZO_STATEMENT=    "https://caixadirecta.cgd.pt/CaixaDirecta/savingsBalance.do"
+BASE=               "https://caixadirectaonline.cgd.pt"
+LOGINSTART=         BASE+"/cdo/login.seam"
+LOGIN=              BASE+"/cdo/auth/forms/login.fcc"
+MAIN=               BASE+"/cdo/private/home.seam"
+ORDEM_STATEMENT=    BASE+"/cdo/private/contasaordem/consultaSaldosMovimentos.seam"
+PRAZO_STATEMENT=    BASE+"/cdo/private/poupancas/consultaSaldosMovimentosPoupanca.seam"
 
-import cxdo_auth, misc
+import misc
 import datetime
+import urllib
 
 
 #each of the following functions returns a tuple with (url, post_data). 
@@ -17,47 +19,30 @@ def login_start( username ):
     return LOGINSTART, {"USERNAME":username}
 
 def login( login_start_page_html, username, password):
-    auth_data= cxdo_auth.parameters(login_start_page_html, username,password) 
-    return LOGIN, auth_data, True
+    params= {"username":"CDO"+username, "password":password, "target": MAIN[len(BASE):]}
+    return LOGIN, params, True
 
 def main():
     return MAIN,
 
 
-def account_statement( account_index= None, ordem=True, start_date=None, end_date=None):
+def account_statement( ordem=True ):
     base_url= ORDEM_STATEMENT if ordem else PRAZO_STATEMENT
     parameters={}
-    if account_index:
-        parameters.update(
-            {
-            "accountIndex": account_index, 
-            "changeActiveAccount" : 1,
-            })
-        if start_date and end_date:
-            assert isinstance(start_date, datetime.datetime)
-            assert isinstance(end_date,   datetime.datetime)
-            parameters.update(
-                {
-                "periodValues": -1,
-                })
-            parameters.update( misc.datetime_to_post_format(start_date, "startDate."))
-            parameters.update( misc.datetime_to_post_format(end_date,   "endDate."))
     return base_url, parameters
 
 
-def get_movements_file( ordem, start_date=None, end_date=None, format="tsv"):
-    '''for this call to work correctly, one must first change the page to the account statement page'''
-    '''cIdParam=LLsMLsD&channelIdAs=statement.do&statementKey=1323276889093&filter=&refresh=&moreResults=&nextPageId=&accountLabel=conta_a_ordem&accountIndex=2&changeActiveAccount=0&periodValues=4&startDate.day=7&startDate.month=11&startDate.year=2011&startDate.wasChanged=1&startDate.hour=16&startDate.minute=54&endDate.day=7&endDate.month=12&endDate.year=2011&endDate.wasChanged=1&endDate.hour=16&endDate.minute=54&totalBalance=725.54&availableBalance=717.56'''
-    assert format in  ('tsv','csv')
-    base_url= ORDEM_STATEMENT if ordem else PRAZO_STATEMENT
-    parameters= \
-        {
-        "download": "globalStatement."+format,
-        "downloadTypeP": format,
-        "periodValues": -1,
-        "changeActiveAccount" : 0,
-        }
-    parameters.update( misc.datetime_to_post_format(start_date, "startDate."))
-    parameters.update( misc.datetime_to_post_format(end_date,   "endDate."))
+def get_movements_file( account_page_html ):
+    '''for this call to work correctly, one must first change the page 
+    to the account statement page, and set its html as argument here'''
+    ac_values, ac_labels, ac_selected= get_accounts( account_page_html )
+    consultaMovimentos=consultaMovimentos
+consultaMovimentos_downloadTSV_downloadId=consultaMovimentos_downloadTSV_downloadId1353016388644
 
-    return base_url, parameters
+consultaMovimentos%3AselectedAccount=PT 00350222066805600EUR0
+consultaMovimentos%3Aperiodo=MONTH
+consultaMovimentos%3Akid_j_id1741_inputField=15-10-2012
+consultaMovimentos%3Akid_j_id1742_inputField=15-11-2012
+javax.faces.ViewState=j_id3:j_id4
+consultaMovimentos%3AdownloadTSV=consultaMovimentos:downloadTSV
+

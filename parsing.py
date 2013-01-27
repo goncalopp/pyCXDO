@@ -8,8 +8,8 @@ class CXDOTemporaryError( Exception ):
 
 def get_cxdo_version(html):
     '''Get the cxdo site version on all pages'''
-    B1= "<!-- CXDO: "
-    B2= " -->"
+    B1= 'http-equiv="PCEVer" content="'
+    B2= '"'
     try:
         i= html.index(B1)+len(B1)
         j= html.index(B2, i)
@@ -17,18 +17,33 @@ def get_cxdo_version(html):
     except:
         raise ParsingError("Could not detect CXDO site version")
 
+def get_javax_viewstate(html):
+    soup= BeautifulSoup(html)
+    inpt= soup.find("input",  name="javax.faces.ViewState")
+    if not inpt:
+        raise ParsingError()
+    return inpt['value']
+
+def get_calendar_inputfields(html):
+    soup= BeautifulSoup(html)
+    fields= soup.findAll( "input", class="inputCalendarField")
+    if not fields:
+        raise ParsingError()
+    import pdb; pdb.set_trace()
+    return a,b IDS!
+
 def get_accounts( html):
     '''gets a dict with accounts indexes, labels on ORDEM_STATEMENT, PRAZO_STATEMENT'''
-    if "Por favor, tente mais tarde" in html:
-        raise CXDOTemporaryError("page returned 'Por favor, tente mais tarde'")
     soup= BeautifulSoup(html)
-    fieldset=   soup.find('fieldset')
+    fieldset=   soup.find("select", id='consultaMovimentos:selectedAccount')
     if not fieldset:
         raise ParsingError()
-    options=    fieldset.div.select.findAll("option")
+    options=    fieldset.findAll("option")
     values=     [ option['value'] for option in options ]
     labels=     [ option.string for option in options ]
-    return dict(zip(labels, values))
+    import pdb;pdb.set_trace()
+    selected=   0
+    return values, labels, selected
 
 def session_expired( html ):
     return "mainArea_center_unAuth" in html

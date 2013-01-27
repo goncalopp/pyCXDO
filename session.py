@@ -3,7 +3,7 @@ import cxdo_auth, parsing, urls
 import cookielib
 import logging
 
-CXDO_VERSION= "v61_1_0_WS_v5_124_1"
+CXDO_VERSION= "1.0.64.7  - "
 
 class RedirectedException( Exception ):
     pass
@@ -80,7 +80,7 @@ class Session(object):
                 raise UnauthenticatedException("Session Expired")
         if detect_version:
             site_version= parsing.get_cxdo_version(html)
-            if site_version!=CXDO_VERSION:
+            if not CXDO_VERSION in site_version:
                 tmp= "CXDO site version differs from expected. got '{0}', expected '{1}'".format(site_version, CXDO_VERSION)
                 if Session.ENFORCE_VERSION:
                     raise SiteVersionMismatch( tmp )
