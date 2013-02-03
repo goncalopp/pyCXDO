@@ -10,9 +10,11 @@ class CXDOConnectedObject( object ):
 class Account( CXDOConnectedObject ):
     PRAZO, ORDEM= "prazo", "ordem"
     '''this class represents an bank account'''
-    def __init__(self, name, index, account_type, *args):
+    def __init__(self, name, label, index, account_type, *args):
+        assert account_type in (self.PRAZO, self.ORDEM)
         CXDOConnectedObject.__init__(self, *args)
         self.name= name
+        self.label= label
         self.index= index
         self.account_type= account_type
         
@@ -20,25 +22,22 @@ class Account( CXDOConnectedObject ):
         '''gets the current account balance'''
         raise NotImplementedError()
 
-    def getName( self ):
-        return self.name
-
-    def getIndex (self ):
-        return self.index
-
     def getAccountNumber(self):
         raise NotImplementedError()
 
     def _fetch_transactions(self):
         start_date= datetime.datetime(year=2009, month=1, day=1)
         end_date= datetime.datetime.utcnow()
-        file_str= self.connection.get_movements_file( self.index, start_date, end_date, self.account_type==Account.ORDEM)
+        file_str= self.connection.get_movements_file( self, start_date, end_date, self.account_type==Account.ORDEM)
         self.transactions= transactions.parse_tsv( file_str)
 
     def getTransactions( self ):
         if not hasattr(self, "transactions"):
             self._fetch_transactions()
         return self.transactions.transactions
+
+    def __repr__(self):
+        return "<Account({0}, {1})>".format(self.label, self.name)
 
 class CXDOConnection( session.Session ):
     '''this class contains high level methods to fetch information from the site'''
@@ -49,10 +48,22 @@ class CXDOConnection( session.Session ):
     def get_prazo_accounts(self):
         html= self.get_page( *urls.account_statement( ordem=False) )
         return parsing.get_accounts(html)
-    
-    def get_movements_file(self, account_index, start_date, end_date, ordem=True, format='tsv'):
-        self.get_page( *urls.account_statement( account_index=account_index, ordem=ordem, start_date=start_date, end_date=end_date))
-        html= self.get_page( *urls.get_movements_file( ordem=ordem, start_date=start_date, end_date=end_date, format=format), detect_version=False)
+
+    def get_account_page(self, account):
+        '''navigates to an account page (marks it as selected...)'''
+        ordem= (account.account_type==Account.ORDEM)
+        html= self.get_page( *urls.account_statement( ordem=ordem ) )
+        names, labels, selected= parsing.get_accounts(html)
+        if selected==account.name:
+            #the wanted account was the default one
+            return html
+        fields= parsing.get_form_input_values(html, "consultaMovimentos")
+        import pdb; pdb.set_trace()
+        self.get_page( urls.account_statement( ordem )[0], fields)
+
+        
+    def get_movements_file(self, account, start_date, end_date, ordem=True, format='tsv'):
+        html= self.get_account_page( account )
         return html
 
 class CXDO( CXDOConnectedObject ):
@@ -62,18 +73,25 @@ class CXDO( CXDOConnectedObject ):
 
     def _fetch_accounts(self):
         c=self.connection
-        accounts= \
-            [ Account(name, index, Account.ORDEM, self.connection) for name,index in c.get_ordem_accounts().items() ] + \
-            [ Account(name, index, Account.PRAZO, self.connection) for name,index in c.get_prazo_accounts().items()]
-        self.accounts= dict( [(a.getName(), a) for a in accounts])
-            
-    def list_accounts(self):
+        self.accounts=[]
+        for accs, typ in (
+                         (c.get_ordem_accounts(), Account.ORDEM), 
+                         (c.get_prazo_accounts(), Account.PRAZO),
+                          ):
+            names, labels, selected= accs
+            for i in range(len(names)):
+                self.accounts.append( Account(names[i], labels[i], i, typ, self.connection) )
+
+    def get_accounts(self):
         '''lists accounts by name'''
         if not hasattr(self, "accounts"):
             self._fetch_accounts()
-        return self.accounts.keys()
+        return self.accounts[:]
 
-    def getAccount( self, name ):
-        if not hasattr(self, "accounts"):
-            self._fetch_accounts()
-        return self.accounts[name]
+    def getAccount( self, s ):
+        matches= [a for a in self.accounts if s in a.name or s in a.label]
+        if len(matches)==0:
+            raise Exception("No account matches")
+        if len(matches)>1:
+            raise Exception("Multiple account matches: "+str(matches))
+        return matches[0]

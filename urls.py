@@ -37,12 +37,3 @@ def get_movements_file( account_page_html ):
     to the account statement page, and set its html as argument here'''
     ac_values, ac_labels, ac_selected= get_accounts( account_page_html )
     consultaMovimentos=consultaMovimentos
-consultaMovimentos_downloadTSV_downloadId=consultaMovimentos_downloadTSV_downloadId1353016388644
-
-consultaMovimentos%3AselectedAccount=PT 00350222066805600EUR0
-consultaMovimentos%3Aperiodo=MONTH
-consultaMovimentos%3Akid_j_id1741_inputField=15-10-2012
-consultaMovimentos%3Akid_j_id1742_inputField=15-11-2012
-javax.faces.ViewState=j_id3:j_id4
-consultaMovimentos%3AdownloadTSV=consultaMovimentos:downloadTSV
-

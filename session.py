@@ -3,7 +3,8 @@ import cxdo_auth, parsing, urls
 import cookielib
 import logging
 
-CXDO_VERSION= "1.0.64.7  - "
+
+CXDO_VERSION= "1.0.67.5.2  - "
 
 class RedirectedException( Exception ):
     pass
@@ -12,6 +13,8 @@ class AuthenticationException( Exception):
 class UnauthenticatedException( Exception ):
     pass
 class SiteVersionMismatch( Exception ):
+    pass
+class ServiceTemporarilyUnavaliable( Exception ):
     pass
 
 
@@ -61,20 +64,22 @@ class Session(object):
         except AssertionError:
             raise Exception("Wrong user/password parameters")
         l1_html= self.get_page( *urls.login_start(user), check_authentication=False ) #needed to set cookies?
-        l2_html= self.get_page( *urls.login(l1_html, user,password), check_authentication=False)
+        l2_html= self.get_page( *urls.login(l1_html, user,password), check_authentication=False, anonymize_log=True)
         if not self._check_is_authenticated():
             raise AuthenticationException("Could not authenticate with given data")
         if not self.cookie_file is None:
             self._save_session()
 
 
-    def get_page(self, url, parameters={}, allow_redirects=False, detect_version=True, check_authentication=True):
-        logging.debug("get page {0}?{1}".format(url,parameters))
+    def get_page(self, url, parameters={}, allow_redirects=False, detect_version=True, check_authentication=True, anonymize_log=False):
+        logging.debug("get page {0}?{1}".format(url,parameters if not anonymize_log else "[ANONYMIZED PARAMETERS]"))
         d= urllib.urlencode(parameters)
         f= self.opener.open(url, data=d)
-        if not allow_redirects and f.geturl()!=url:
-            raise RedirectedException("got "+f.geturl()+" instead of "+url)
         html= f.read()
+        if not allow_redirects and f.geturl()!=url:
+            if parsing.service_temporarily_unavailable(html):
+                raise ServiceTemporarilyUnavaliable()
+            raise RedirectedException("got "+f.geturl()+" instead of "+url)
         if check_authentication:
             if parsing.session_expired(html):
                 raise UnauthenticatedException("Session Expired")
